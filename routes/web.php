@@ -19,6 +19,9 @@ Route::group(['middleware' => ['auth']], function () {
             // users route
             Route::resource('users',        'UsersController');
             Route::post('/users/crop',   'UsersController@cropProfile')->name('users.crop');
+            // social route
+            Route::resource('socials',        'SocialController');
+            Route::post('/socials/crop',   'SocialController@cropImage')->name('socials.crop');
             // roles route
             Route::resource('roles',        'RolesController');
             Route::get('/roles/move/move-up',      'RolesController@moveUp')->name('roles.up');

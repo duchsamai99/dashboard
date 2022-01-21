@@ -32,7 +32,7 @@
                         </tr>
                     </tbody>
                 </table>
-                <a class="btn btn-primary" href="{{ route('roles.index') }}">Return</a>
+                <a class="btn btn-primary text-white" href="{{ route('roles.index') }}">Return</a>
             </div>
           </div>
         </div>

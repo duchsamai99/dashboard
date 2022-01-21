@@ -1,8 +1,5 @@
 @extends('dashboard.base')
-
 @section('content')
-
-
 <div class="container-fluid">
   <div class="fade-in">
     <div class="row">
@@ -27,8 +24,8 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button class="btn btn-primary" type="submit">Save</button>
-                    <a class="btn btn-primary" href="{{ route('roles.index') }}">Return</a>
+                    <button class="btn btn-infor" type="submit">Save</button>
+                    <a class="btn btn-warning text white" href="{{ route('roles.index') }}">Return</a>
                 </form>
             </div>
           </div>

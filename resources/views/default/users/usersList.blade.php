@@ -5,7 +5,7 @@
   <div class="container-fluid">
     <div class="animated fadeIn">
       <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-8 col-xl-8">
+        <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
           <div class="card">
               <div class="card-header">
               <div class="row mb-3 ml-1">

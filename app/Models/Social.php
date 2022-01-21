@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Social extends Model
 {
     protected $table = 'tbl_socials';
+    public $primaryKey = 'socAutoID';
     public $timestamps = false; 
 }

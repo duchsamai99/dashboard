@@ -27,13 +27,10 @@
                     </thead>
                     <tbody>  
                         @foreach($slides as $slide)
-                        <!-- <input type="hidden" name="id" value="{{ $slide->id }}" id="id"/> -->
-
-                                                    <!-- Delete Product Model -->
                             <form action="{{route('slides.delete', $slide->id)}}" method="POST" enctype="multiple/form-data">
                                 {{method_field('delete')}}
                                 {{csrf_field()}}    
-                            <div id="ModalDelete{{$slide->id}}" class="modal fade" role="dialog" tabindex="-1" aria-hidden="true">
+                                <div id="ModalDelete{{$slide->id}}" class="modal fade" role="dialog" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog" style="width:55%" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">

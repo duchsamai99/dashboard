@@ -30,8 +30,8 @@
                 <div class="form-group">
                   <strong>User role:</strong>
                   <select class = "form-control" name="role" id="">
-                    <option value="User" selected>User</option>
-                    <option value="Admin" >Admin</option>
+                    <option value="user" selected>user</option>
+                    <option value="dmin" >admin</option>
                     <option value="guest">guest</option>
                   </select>
                 </div>

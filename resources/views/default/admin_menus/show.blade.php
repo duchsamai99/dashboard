@@ -13,7 +13,6 @@
                 @if(Session::has('message'))
                     <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
                 @endif
-
                     <table class="table table-striped table-bordered datatable">
                         <tbody>
                             <tr>
@@ -86,7 +85,7 @@
                             </tr>
                         </tbody>
                     </table>
-                    <a class="btn btn-primary" href="{{ route('menu.index', ['menu' => $menuElement->menu_id]) }}">Return</a>
+                    <a class="btn btn-warning" href="{{ route('menu.index', ['menu' => $menuElement->menu_id]) }}">Return</a>
             </div>
           </div>
         </div>
@@ -94,10 +93,8 @@
     </div>
   </div>
 </div>
-
 @endsection
 
 @section('javascript')
-
 
 @endsection
