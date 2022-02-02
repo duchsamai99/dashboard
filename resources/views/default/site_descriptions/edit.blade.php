@@ -15,19 +15,24 @@
     <div class="fade-in">
       <div class="row">
         <div class="col-sm-12">
-          @if(Session::has('message'))
-            <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
+          @if(Session::has('message_success'))
+            <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+          @elseif(Session::has('message_fail'))
+            <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
           @endif
           <form id="submit">
             <div class="card">
-              <div class="card-header">Site Description</div>
+              <div class="card-header">
+                <h4>Edit site description</h4> 
+              </div>
               <div class="card-body">
                 <div class="row">
                   <div class="col-xs-4 col-sm-4 col-md-4">
                     <div class="card shadow p-3 mb-5 bg-white rounded">
                       <div class="card-body">
                         <div class="form-group">
-                          <span>Image:</span>
+                          <input type="hidden" name="sitAutoID" value="{{$sit_description->sitAutoID }}" id="sitAutoID"/>
+                          <span>Image logo:</span>
                           <input type="file" name="sitImage1" id="sitImage1" class="form-control image btn btn-block" placeholder="Slide Image">
                         </div>
                       </div>
@@ -37,7 +42,7 @@
                     <div class="card shadow p-3 mb-5 bg-white rounded">
                       <div class="card-body">
                         <div class="form-group">
-                          <span>Image:</span>
+                          <span>Image background:</span>
                           <input type="file" name="sitImage2" id="sitImage2" class="form-control image btn btn-block" placeholder="Slide Image">
                         </div>
                       </div>
@@ -47,8 +52,8 @@
                     <div class="card shadow p-3 mb-5 bg-white rounded">
                       <div class="card-body">
                         <div class="form-group">
-                          <span>Image:</span>
-                          <input type="file" name="SitImage3" id="sitImage3" class="form-control image btn btn-block" placeholder="Slide Image" >
+                          <span>Image benner:</span>
+                          <input type="file" name="sitImage3" id="sitImage3" class="form-control image btn btn-block" placeholder="Slide Image" >
                         </div>
                       </div>
                     </div>
@@ -56,49 +61,50 @@
                 </div>
                 <div class="row">
                   <div class="col-xs-4 col-sm-4 col-md-4">
-                    <img src="/uploads/{{$sit_description->SitImage1 }}" class="rounded-circle" alt="SitImage1">
+                    <img src="/uploads/site_descriptions/{{$sit_description->sitImage1 }}" class="bg-info" id="preview_image1" style="width: 50%; padding: 5px; margin: 0px; ">
                   </div>
                   <div class="col-xs-4 col-sm-4 col-md-4">
-                    <img src="/uploads/{{$sit_description->SitImage2 }}" alt="SitImage2">
+                    <img src="/uploads/site_descriptions/{{$sit_description->sitImage2 }}" class="bg-info" id="preview_image2" style="width: 50%; padding: 5px; margin: 0px; ">
                   </div>
                   <div class="col-xs-4 col-sm-4 col-md-4">
-                    <img src="/uploads/{{$sit_description->SitImage3 }}" alt="SitImage3">
+                    <img src="/uploads/site_descriptions/{{$sit_description->sitImage3 }}" class="bg-info" id="preview_image3" style="width: 50%; padding: 5px; margin: 0px; ">
                   </div>
 
                 </div>
+                <br>
                 <div class="row">
                   <div class="col-xs-12 col-sm-12 col-md-12">
                     <div class="form-group">
-                      <span class="text-secondary">Site Name:</span>
-                      <input type="text" name="sitName" id="sitName" class="form-control w3-input" value="{{$sit_description->SitName}}">
+                      <span>site Name:</span>
+                      <input type="text" name="sitName" id="sitName" class="form-control w3-input" value="{{$sit_description->sitName}}" required>
                     </div>   
                   </div>
                   <div class="col-xs-12 col-sm-12 col-md-12">
                     <div class="form-group">
-                      <span class="text-secondary">Copy Right:</span>
-                      <input type="text" name="sitCopyRight" id="sitCopyRight" class="form-control w3-input" value="{{$sit_description->SitName}}">
+                      <span>Copy Right:</span>
+                      <input type="text" name="sitCopyRight" id="sitCopyRight" class="form-control w3-input" value="{{$sit_description->sitCopyRight}}" required>
                     </div>   
                   </div>
                   <div class="col-xs-12 col-sm-12 col-md-12">
                     <div class="form-group">
-                      <span class="text-secondary">ReciverMail:</span>
-                      <input type="text" name="sitReceiverMail" id="sitReceiverMail" class="form-control w3-input" value="{{$sit_description->SitReceiverMail}}">
+                      <span>ReciverMail:</span>
+                      <input type="text" name="sitReceiverMail" id="sitReceiverMail" class="form-control w3-input" value="{{$sit_description->sitReceiverMail}}" required>
                     </div>
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-xs-12 col-sm-12 col-md-12">
                     <div class="form-group">
-                      <span class="text-secondary">Phone number:</span>
-                      <input type="text" name="sitPhoneNumber" id="sitPhoneNumber" class="form-control w3-input" value="{{$sit_description->SitPhoneNumber}}">
+                      <span>Phone number:</span>
+                      <input type="text" name="sitPhoneNumber" id="sitPhoneNumber" class="form-control w3-input" value="{{$sit_description->sitPhoneNumber}}" required>
                     </div>   
                   </div>
                 </div>
                 <button class="btn btn-info"type="submit">Save</button>
-                <a class="btn text-white btn-warning" href="{{ route('site-descriptions.index') }}">Return</a>
               </div>
             </div>       
           </form>
+          <!-- model1 -->
           <div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
               <div class="modal-content">
@@ -131,7 +137,6 @@
               </div>
             </div>
           </div>
-          <!--endModal -->
           </div>
         </div>
       </div>
@@ -166,7 +171,19 @@
   var image = document.getElementById('image');
   
   var cropper;
-  var getData;
+  var getImage1;
+  var getImage2;
+  var getImage3;
+  var id_name;
+  $("#sitImage1").click(function(){
+    id_name = "sitImage1"
+  });
+  $("#sitImage2").click(function(){
+    id_name = "sitImage2"
+  });
+  $("#sitImage3").click(function(){
+    id_name = "sitImage3"
+  });
   $("#body").on("change", ".image", function(e){
       var files = e.target.files;
       var done = function (url) {
@@ -194,8 +211,8 @@
 
   $modal.on('shown.bs.modal', function () {
       cropper = new Cropper(image, {
-      aspectRatio: 1,
-      viewMode: 3,
+      // aspectRatio: 2,
+      // viewMode: 2,
       preview: '.preview'
       });
   }).on('hidden.bs.modal', function () {
@@ -218,41 +235,74 @@
                   type: "POST",
                   dataType: "json",
                   url: "/site-descriptions/crop",
-                  data: {'_token': $('meta[name="_token"]').attr('content'), 'sitImage1': base64data},
+                  data: {'_token': $('meta[name="_token"]').attr('content'), 'sitImage': base64data},
                   success: function(data){
-                  getData = data;
-                    console.log(data);
-                      $modal.modal('hide');
-                      // location.replace('/slides/create');
+                    $modal.modal('hide');
+                    console.log(id_name);
+                    if(id_name =='sitImage1'){
+                      getImage1 = data;
+                      $('#preview_image1').attr('src', '/uploads/site_descriptions/'+getImage1.data);
+                    }
+                    if(id_name =='sitImage2'){
+                      getImage2 = data;
+                      $('#preview_image2').attr('src', '/uploads/site_descriptions/'+getImage2.data);
+                    }
+                    if(id_name =='sitImage3'){
+                      getImage3 = data;
+                      $('#preview_image3').attr('src', '/uploads/site_descriptions/'+getImage3.data);
+
+                    }
                   }
               });
           }
       });
   });
+  
   // sumite all data to store method in controller
   $('#submit').on('submit',function(e){
     e.preventDefault();
-    var sitImage1 = $("#sitImage1").val();
+    var sitAutoID = $("#sitAutoID").val();
     var sitName= $("#sitName").val();
     var sitCopyRight= $("#sitCopyRight").val();
     var sitReceiverMail= $("#sitReceiverMail").val();
     var sitPhoneNumber= $("#sitPhoneNumber").val();
-    var sitImage1 = getData.data;
+    var sitImage1 ="{{$sit_description->sitImage1}}";
+    var sitImage2 ="{{$sit_description->sitImage2}}";
+    var sitImage3 ="{{$sit_description->sitImage3}}";
+
+    if(getImage1 != undefined){
+      sitImage1 = getImage1.data;
+    }
+    if(getImage2 != undefined){
+      sitImage2 = getImage2.data;
+    }if(getImage3 != undefined){
+      sitImage3 = getImage3.data;
+    }
     $.ajax({
-      url: "/site-descriptions",
-      type:"POST",
+      url: "/site-descriptions/{{ $sit_description->sitAutoID }}",
+      type:"PUT",
       dataType: 'json',
       data:{
         "_token": "{{ csrf_token() }}",
+        sitAutoID:sitAutoID,
         sitName:sitName,
         sitCopyRight:sitCopyRight,
         sitReceiverMail:sitReceiverMail,
         sitPhoneNumber:sitPhoneNumber,
-        sitImage1:sitImage1
+        sitImage1:sitImage1,
+        sitImage2:sitImage2,
+        sitImage3:sitImage3,
+
       },
       success:function(response){
         console.log(response);
-        location.replace('/site-descriptions/'+1+'/edit');
+        if(response == true){
+          location.replace('/site-descriptions');
+
+        }else{
+          location.replace('/site-descriptions');
+
+        }
       }
       });
   });

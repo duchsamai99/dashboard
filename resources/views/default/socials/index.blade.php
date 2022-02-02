@@ -6,11 +6,16 @@
     <div class="row">
       <div class="col-sm-12">
         <div class="card">
-          <div class="card-header"><h4>List all socials</h4></div>
+          <div class="card-header"><h4>List of socials</h4></div>
             <div class="card-body">
                 <div class="row mb-3 ml-1">
                     <a class="btn btn-lg btn-info" href="{{ route('socials.create') }}">Add new social</a>
                 </div>
+                @if(Session::has('message_success'))
+                    <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+                @elseif(Session::has('message_fail'))
+                    <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
+                @endif
                 <table class="table table-striped table-bordered datatable">
                     <thead>
                         <tr>
@@ -35,7 +40,7 @@
                                     <div class="modal-dialog" style="width:55%" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title">Delete conformation</h4>
+                                                <h4 class="modal-title">Confirmation message</h4>
                                                 <button type="button" class="close" data-dismiss="modal">×</button>
                                             </div>
                                             <div class="modal-body">
@@ -53,7 +58,7 @@
                             <!-- end delete modal -->
                             <tr>
                                 <td>
-                                    {{ $social->socAutoID}}
+                                    {{ $social->socID}}
                                 </td>
                                 <td>
                                     {{ $social->socTitle}}

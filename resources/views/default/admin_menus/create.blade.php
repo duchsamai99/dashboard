@@ -8,10 +8,12 @@
     <div class="row">
       <div class="col-sm-12">
         <div class="card">
-          <div class="card-header"><h4>Create menu element</h4></div>
+          <div class="card-header"><h4>Create admin menu</h4></div>
             <div class="card-body">
-                @if(Session::has('message'))
-                    <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
+                @if(Session::has('message_success'))
+                    <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+                @elseif(Session::has('message_fail'))
+                    <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
                 @endif
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -27,16 +29,16 @@
                     <table class="table table-striped table-bordered datatable">
                         <tbody>
                             <tr>
-                                <th>
+                                <!-- <th>
                                     Menu
-                                </th>
-                                <td>
-                                    <select class="form-control" name="menu" id="menu">
+                                </th> -->
+                                <!-- <td> -->
+                                    <select hidden class="form-control" name="menu" id="menu">
                                         @foreach($menulist as $menu1)
                                             <option value="{{ $menu1->id }}">{{ $menu1->name }}</option>
                                         @endforeach
                                     </select>
-                                </td>
+                                <!-- </td> -->
                             </tr>
                             <tr>
                                 <th>
@@ -44,13 +46,24 @@
                                 </th>
                                 <td>
                                     <table class="table">
-                                    @foreach($roles as $role)
+                                    @foreach($roles as $key => $role)
                                         <tr>
                                             <td>
-                                                <input type="checkbox" name="role[]" value="{{ $role }}" class="form-control"/>
+                                                <input  id="{{$key}}" type="checkbox" name="role[]" value="{{ $role }}" class="form-control check"/>
                                             </td>
                                             <td>
-                                                {{ $role }}
+                                                <h5>{{ $role->name }}</h5>
+                                                <p>Permission: </p>
+                                                @foreach($actions as $action)
+                                                    @if($action->actRoleID == $role->id)
+                                                        <div class="form-check">
+                                                            <label class="form-check-label">
+                                                                <input  type="checkbox"  disabled class="form-check-input checkbox permission{{$key}}" name="action[]" value="{{$action}}">{{$action->actName}}
+                                                            </label>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                                
                                             </td>
                                         </tr>
                                     @endforeach
@@ -119,7 +132,30 @@
     </div>
   </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+<script>
+    $(".check").click(function(){
+        var id_name = $(this).attr('id');
+        console.log(id_name);
+        var remember = document.getElementById(id_name).value;
+        console.log(remember);
+        var checkbox_condition = $('#'+id_name).is(":checked");
+        if(checkbox_condition){
+            $( '.permission'+id_name ).prop({
+                disabled: false
+            });
+            $( '.permission'+id_name ).prop( "checked", true );
 
+        }else{
+            $('.permission'+id_name ).prop({
+                disabled: true
+            });
+            $( '.permission'+id_name ).prop( "checked", false );
+
+        }
+        
+    })
+</script>
 @endsection
 
 @section('javascript')

@@ -5,6 +5,7 @@
 
 if(!function_exists('renderDropdown')){
     function renderDropdown($data){
+        
         if(array_key_exists('slug', $data) && $data['slug'] === 'dropdown'){
             echo '<li class="c-sidebar-nav-dropdown">';
             echo '<a class="c-sidebar-nav-dropdown-toggle" href="#">';
@@ -19,7 +20,7 @@ if(!function_exists('renderDropdown')){
             for($i = 0; $i < count($data); $i++){
                 if( $data[$i]['slug'] === 'link' ){
                     echo '<li class="c-sidebar-nav-item">';
-                    echo '<a class="c-sidebar-nav-link" href="' . url($data[$i]['href']) . '">';
+                    echo '<a class="c-sidebar-nav-link" href="' . url($data[$i]['href'].'/?current_menu_id='.$data[$i]['id']) . '">';
                     echo '<span class="c-sidebar-nav-icon"></span>' . $data[$i]['name'] . '</a></li>';
                 }elseif( $data[$i]['slug'] === 'dropdown' ){
                     renderDropdown( $data[$i] );
@@ -29,10 +30,8 @@ if(!function_exists('renderDropdown')){
     }
 }
 ?>
-
-
         <div class="c-sidebar-brand ">
-            <div class="c-avatar"><img width="150" height="66" class="" src="/uploads/amtak_logo.jpg" alt="logo"></div>
+            <div class="c-avatar"><img width="150" height="50" class="" src="/uploads/site_descriptions/{{ Session::get('logo_image') }}" alt="logo"></div>
             <!-- <img class="c-sidebar-brand-full" src="{{ url('/assets/brand/coreui-base-white.svg') }}" width="118" height="46" alt="CoreUI Logo"> -->
             <img class="c-sidebar-brand-minimized" src="{{ url('assets/brand/coreui-signet-white.svg') }}" width="118" height="46" alt="CoreUI Logo">
         </div>
@@ -41,7 +40,11 @@ if(!function_exists('renderDropdown')){
             @foreach($appMenus['sidebar menu'] as $menuel)
                 @if($menuel['slug'] === 'link')
                     <li class="c-sidebar-nav-item">
-                        <a class="c-sidebar-nav-link" href="{{ url($menuel['href']) }}">
+                        @if($menuel['href'] == '')
+                            <a class="c-sidebar-nav-link" href="">
+                        @else
+                            <a class="c-sidebar-nav-link" href="{{ url($menuel['href'].'?current_menu_id='.$menuel['id']) }}">
+                        @endif
                         @if($menuel['hasIcon'] === true)
                             @if($menuel['iconType'] === 'coreui')
                                 <i class="{{ $menuel['icon'] }} c-sidebar-nav-icon"></i>
@@ -51,7 +54,9 @@ if(!function_exists('renderDropdown')){
                         </a>
                     </li>
                 @elseif($menuel['slug'] === 'dropdown')
-                    <?php renderDropdown($menuel) ?>
+                    <?php 
+                        renderDropdown($menuel) 
+                    ?>
                     
                 @elseif($menuel['slug'] === 'title')
                     <li class="c-sidebar-nav-title">
@@ -83,3 +88,4 @@ if(!function_exists('renderDropdown')){
 
         
     </style>
+

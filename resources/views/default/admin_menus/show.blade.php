@@ -8,7 +8,7 @@
     <div class="row">
       <div class="col-sm-12">
         <div class="card">
-          <div class="card-header"><h4>Show menu element</h4></div>
+          <div class="card-header"><h4>Show site menu</h4></div>
             <div class="card-body">
                 @if(Session::has('message'))
                     <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
@@ -37,10 +37,22 @@
                                         foreach($menuroles as $menurole){
                                             if($first === true){
                                                 $first = false;
-                                            }else{
-                                                echo ', ';
                                             }
-                                            echo $menurole->role_name;
+                                            echo '<b>'.$menurole->amrRoleName.'</b>';
+                                            echo '<ul>';
+                                            if($menurole->amrView ==1){
+                                                echo'<li>View</li>';
+                                            }
+                                            if($menurole->amrInsert ==1){
+                                                echo'<li>Insert</li>';
+                                            }
+                                            if($menurole->amrUpdate ==1){
+                                                echo'<li>Update</li>';
+                                            }
+                                            if($menurole->amrDelete ==1){
+                                                echo'<li>Delete</li>';
+                                            }
+                                            echo '</ul>';
                                         }
                                     ?>
                                 </td>
@@ -58,7 +70,7 @@
                                     Href:
                                 </th>
                                 <td>
-                                    {{ $menuElement->href }}
+                                    {{ $menuElement->href}}
                                 </td>
                             </tr>
                             <tr>

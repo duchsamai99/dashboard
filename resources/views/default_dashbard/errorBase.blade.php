@@ -30,13 +30,13 @@
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="96x96" href="assets/favicon/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
-    <link rel="manifest" href="assets/favicon/manifest.json">
+    <!-- <link rel="manifest" href="assets/favicon/manifest.json"> -->
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="assets/favicon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <!-- Icons-->
     <link href="{{ asset('css/free.min.css') }}" rel="stylesheet"> <!-- icons -->
-    <link href="{{ asset('css/flag-icon.min.css') }}" rel="stylesheet"> <!-- icons -->
+    <!-- <link href="{{ asset('css/flag-icon.min.css') }}" rel="stylesheet"> icons -->
     <!-- Main styles for this application-->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     <!-- Global site tag (gtag.js) - Google Analytics-->
@@ -53,9 +53,7 @@
       // Bootstrap ID
       gtag('config', 'UA-118965717-5');
     </script>
-
     <link href="{{ asset('css/coreui-chartjs.css') }}" rel="stylesheet">
-
   </head>
   <body class="c-app flex-row align-items-center">
 

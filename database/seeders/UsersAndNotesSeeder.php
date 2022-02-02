@@ -1,5 +1,4 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
@@ -8,6 +7,7 @@ use Faker\Factory as Faker;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use App\Models\User;
+use App\Models\Action;
 use App\Models\RoleHierarchy;
 
 class UsersAndNotesSeeder extends Seeder
@@ -16,7 +16,7 @@ class UsersAndNotesSeeder extends Seeder
      * Run the database seeds.
      *
      * @return void
-     */
+    */ 
     public function run()
     {
         $numberOfUsers = 10;
@@ -67,11 +67,40 @@ class UsersAndNotesSeeder extends Seeder
             'name' => 'admin',
             'email' => 'admin@admin.com',
             'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'password' => '$2y$10$dCCygum1fMC8pKxQ/ec8bu02sVnkDxBzNTsyQbXuIGO9TKpznUcm2', // password
             'remember_token' => Str::random(10),
-            'menuroles' => 'user,admin' 
+            'menuroles' => 'admin',
+            'type' => '1' 
+
         ]);
         $user->assignRole('admin');
         $user->assignRole('user');
+        $getRoles = Role::all();
+        foreach($getRoles as $getRole){
+            $action = Action::create([ 
+                'actRoleID' => $getRole->id,
+                'actName' => 'Insert',
+                'actValue' => 0
+                
+            ]);
+            $action = Action::create([ 
+                'actRoleID' => $getRole->id,
+                'actName' => 'View',
+                'actValue' => 0
+                
+            ]);
+            $action = Action::create([ 
+                'actRoleID' => $getRole->id,
+                'actName' => 'Edit',
+                'actValue' => 0
+            ]);
+            $action = Action::create([ 
+                'actRoleID' => $getRole->id,
+                'actName' => 'Delete',
+                'actValue' => 0
+                
+            ]);
+        }
+        
     }
 }

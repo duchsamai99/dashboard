@@ -8,5 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class SiteMenu extends Model
 {
     protected $table = 'tbl_site_menus';
+    public $primaryKey = 'smeAutoID';
     public $timestamps = false; 
 }

@@ -17,54 +17,25 @@
           <div class="card">
             <div class="card-header"><h4>Create Slide</h4></div>
               <div class="card-body">
-                  @if(Session::has('message'))
-                      <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
-                  @endif
+                @if(Session::has('message_success'))
+                  <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+                @elseif(Session::has('message_fail'))
+                  <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
+                @endif
                   <form id="submit">
                       <div class="card">
                           <div class="card-body">
                             <div class="row">
-                                <input type="hidden" name="id" value="{{ $slide->id }}" id="id"/>
+                                <input type="hidden" name="sliAutoID" value="{{ $slide->sliAutoID }}" id="sliAutoID"/>
                                 <div class="col-xs-6 col-sm-6 col-md-6">
                                   <div class="form-group">
                                         <strong>Title:</strong>
-                                        <input type="text" name="sliName" id="sliName" class="form-control" value="{{$slide->sliName}}">
+                                        <input type="text" name="sliName" id="sliName" class="form-control" value="{{$slide->sliName}}" required>
                                   </div>
                                 </div>
                                 <div class="col-xs-6 col-sm-6 col-md-6">
                                   <div class="form-group">
-                                        <strong>Image:</strong>
-                                        <input type="file" name="sliImage" id="sliImage" class="form-control image" placeholder="Slide Image">
-                                  </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                  <div class="col-xs-6 col-sm-6 col-md-6">
-                                      <div class="form-group">
-                                            <strong>Link:</strong>
-                                            <input type="text" name="sliLink" id="sliLink" class="form-control" value="{{$slide->sliLink}}">
-                                      </div>   
-                                  </div>
-                                  <div class="col-xs-6 col-sm-6 col-md-6">
-                                      <div class="form-group">
-                                        <strong>Order:</strong>
-                                        <input type="number" name="sliOrder" id="sliOrder" class="form-control" value="{{$slide->sliOrder}}">
-                                      </div>
-                                  </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-xs-6 col-sm-6 col-md-6">
-                                  <div class="form-group">
-                                      <strong>Description:</strong>
-                                      <div class="form-group">
-                                      <!-- <textarea class="form-control" id="content" name="description" rows="3"></textarea> -->
-                                        <textarea class="form-control" type="text" id="description" name="description" value="">{!! $slide->description!!}</textarea>
-                                      </div>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-lg-6 col-md-6">
-                                  <div class="form-group">
-                                      <span>Status</span>
+                                  <span>Status</span>
                                       <select class="form-control" name="sliStatus" id="sliStatus" aria-label="Default select example">
                                         @if($slide->sliStatus == 1)
                                           <option selected value="1">Active</option>
@@ -74,11 +45,45 @@
                                           <option value="1">Active</option>
                                         @endif
                                       </select>
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                  <div class="col-xs-6 col-sm-6 col-md-6">
+                                      <div class="form-group">
+                                            <strong>Link:</strong>
+                                            <input type="text" name="sliLink" id="sliLink" class="form-control" value="{{$slide->sliLink}}" required>
+                                      </div>   
+                                  </div>
+                                  <div class="col-xs-6 col-sm-6 col-md-6">
+                                      <div class="form-group">
+                                        <strong>Order:</strong>
+                                        <input type="number" name="sliOrder" id="sliOrder" class="form-control" value="{{$slide->sliOrder}}" required>
+                                      </div>
+                                  </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-6 col-sm-6 col-md-6">
+                                  <div class="form-group">
+                                      <strong>Description:</strong>
+                                      <div class="form-group">
+                                      <!-- <textarea class="form-control" id="content" name="sliDescription" rows="3"></textarea> -->
+                                        <textarea class="form-control" type="text" id="sliDescription" name="sliDescription" value="">{!! $slide->sliDescription!!}</textarea>
+                                      </div>
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-lg-6 col-md-6">
+                                  <div class="form-group">
+                                    <strong>Image:</strong>
+                                    <input type="file" name="sliImage" id="sliImage" class="form-control image" placeholder="Slide Image">
+                                    <br>
+                                    <img src="/uploads/{{$slide->sliImage}}" id="preview_image">
+                                      
                                   </div> 
                                 </div>
                             </div>
                             <button class="btn btn-info"type="submit">Save</button>
-                            <a class="btn btn-warning" href="{{ route('slides.index') }}">Return</a>
+                            <a class="btn btn-warning text-white" href="{{ route('slides.index') }}">Return</a>
                           </div>
                       </div>
                           
@@ -182,8 +187,8 @@
 
   $modal.on('shown.bs.modal', function () {
       cropper = new Cropper(image, {
-      aspectRatio: 1,
-      viewMode: 3,
+      // aspectRatio: 1,
+      // viewMode: 3,
       preview: '.preview'
       });
   }).on('hidden.bs.modal', function () {
@@ -209,6 +214,7 @@
                   data: {'_token': $('meta[name="_token"]').attr('content'), 'sliImage': base64data},
                   success: function(data){
                   getData = data;
+                  $('#preview_image').attr('src', '/uploads/'+getData.data);
                     console.log(data);
                       $modal.modal('hide');
                       // location.replace('/slides/create');
@@ -218,37 +224,49 @@
       });
   });
   tinymce.init({
-    selector: 'textarea#description',
+    selector: 'textarea#sliDescription',
     menubar: false
   });
   // sumite all data to store method in controller
   $('#submit').on('submit',function(e){
-    var ed = tinyMCE.get('description');
+    var ed = tinyMCE.get('sliDescription');
     e.preventDefault();
     var sliName = $("#sliName").val();
     var sliOrder= $("#sliOrder").val();
     var sliLink= $("#sliLink").val();
     var sliStatus= $("#sliStatus").val();
-    var id= $("#id").val();
-
-    var description= ed.getContent();
-    var sliImage = getData;
+    var sliAutoID= $("#sliAutoID").val();
+    var sliDescription= ed.getContent();
+    var sliImage = "{{$slide->sliImage}}";
+    
+    if(getData != undefined){
+      sliImage = getData;
+    }
     $.ajax({
       url: "/slides/update",
       type:"POST",
       dataType: 'json',
       data:{
         "_token": "{{ csrf_token() }}",
-        id:id,
+        sliAutoID:sliAutoID,
         sliName:sliName,
-        description:description,
+        sliDescription:sliDescription,
         sliOrder:sliOrder,
         sliLink:sliLink,
         sliStatus:sliStatus,
-        sliImage:sliImage.data
+        sliImage:sliImage
       },
       success:function(response){
-        location.replace('/slides');
+        //location.replace('/slides');
+        if(response == true){
+          location.replace('/slides');
+
+        }else{
+          location.replace('/slides');
+
+          // location.replace('/slides/edit?sliAtutoID='.$slide->sliAutoID);
+
+        }
       }
       });
   });

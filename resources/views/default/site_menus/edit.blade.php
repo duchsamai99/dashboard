@@ -10,8 +10,10 @@
         <div class="card">
           <div class="card-header"><h4>Edit menu element</h4></div>
             <div class="card-body">
-                @if(Session::has('message'))
-                    <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
+                @if(Session::has('message_success'))
+                  <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+                @elseif(Session::has('message_fail'))
+                  <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
                 @endif
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -24,56 +26,25 @@
                 @endif
                 <form action="{{ route('site.menu.update') }}" method="POST">
                     @csrf
-                    <input type="hidden" name="id" value="{{ $menuElement->id }}" id="menuElementId"/>
+                    <input type="hidden" name="id" value="{{ $menuElement->smeAutoID }}" id="menuElementId"/>
                     <table class="table table-striped table-bordered datatable">
                         <tbody>
                             <tr>
-                                <th>
+                                <!-- <th>
                                     Menu
                                 </th>
-                                <td>
-                                    <select class="form-control" name="menu" id="menu">
+                                <td> -->
+                                    <select hidden class="form-control" name="menu" id="menu">
                                         @foreach($menulist as $menu1)
-                                            @if($menu1->id == $menuElement->menu_id  )
+                                            @if($menu1->id == $menuElement->smeMenu_id  )
                                                 <option value="{{ $menu1->id }}" selected>{{ $menu1->name }}</option>
                                             @else
                                                 <option value="{{ $menu1->id }}">{{ $menu1->name }}</option>
                                             @endif
                                         @endforeach
                                     </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    User Roles
-                                </th>
-                                <td>
-                                    <table class="table">
-                                    @foreach($roles as $role)
-                                        <tr>
-                                            <td>
-                                                <?php
-                                                    $temp = false;
-                                                    foreach($menuroles as $menurole){
-                                                        if($role == $menurole->role_name){
-                                                            $temp = true;
-                                                        }
-                                                    }
-                                                    if($temp === true){
-                                                        echo '<input checked type="checkbox" name="role[]" value="' . $role . '" class="form-control"/>';
-                                                    }else{
-                                                        echo '<input type="checkbox" name="role[]" value="' . $role . '" class="form-control"/>';
-                                                    }
-                                                ?>
-                                            </td>
-                                            <td>
-                                                {{ $role }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                    </table>
-                                </td>
-                            </tr>
+                                <!-- </td>
+                            </tr> -->
                             <tr>
                                 <th>
                                     Name
@@ -83,7 +54,7 @@
                                     type="text" 
                                     class="form-control" 
                                     name="name" 
-                                    value="{{ $menuElement->name }}"
+                                    value="{{ $menuElement->smeName }}"
                                     placeholder="Name"
                                     />
                                 </td>
@@ -94,17 +65,17 @@
                                 </th>
                                 <td>
                                     <select class="form-control" name="type" id="type">
-                                        @if($menuElement->slug === 'link')
+                                        @if($menuElement->smeSlug === 'link')
                                             <option value="link" selected>Link</option>
                                         @else
                                             <option value="link">Link</option>
                                         @endif
-                                        @if($menuElement->slug === 'title')
+                                        @if($menuElement->smeSlug === 'title')
                                             <option value="title" selected>Title</option>
                                         @else
                                             <option value="title">Title</option>
                                         @endif
-                                        @if($menuElement->slug === 'dropdown')
+                                        @if($menuElement->smeSlug === 'dropdown')
                                             <option value="dropdown" selected>Dropdown</option>
                                         @else
                                             <option value="dropdown">Dropdown</option>
@@ -124,19 +95,19 @@
                                             name="href" 
                                             class="form-control" 
                                             placeholder="href"
-                                            value="{{ $menuElement->href }}"
+                                            value="{{ $menuElement->smeHref }}"
                                         />
                                     </div>
                                     <br><br>
                                     <div id="div-dropdown-parent">
                                         Dropdown parent:
-                                        <input type="hidden" id="parentId" value="{{ $menuElement->parent_id }}"/>
+                                        <input type="hidden" id="parentId" value="{{ $menuElement->smeParent_id }}"/>
                                         <select class="form-control" name="parent" id="parent">
 
                                         </select>
                                     </div>
                                     <br><br>
-                                    <div id="div-icon">
+                                    <div hidden id="div-icon">
                                         Icon - Find icon class in: 
                                         <a 
                                             href="https://coreui.io/docs/icons/icons-list/#coreui-icons-free-502-icons"
@@ -150,15 +121,15 @@
                                             name="icon" 
                                             type="text" 
                                             placeholder="CoreUI Icon class - example: cil-bell"
-                                            value="{{ $menuElement->icon }}"
+                                            value="{{ $menuElement->smeIcon }}"
                                         >
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <button class="btn btn-primary" type="submit">Save</button>
-                    <a class="btn btn-primary" href="{{ route('site.menu.index', ['menu' => $menuElement->menu_id]) }}">Return</a>
+                    <button class="btn btn-info" type="submit">Save</button>
+                    <a class="btn btn-warning text-white" href="{{ route('site.menu.index', ['menu' => $menuElement->smeMenu_id]) }}">Return</a>
                 </form>
             </div>
           </div>
@@ -172,7 +143,7 @@
 
 @section('javascript')
 <script src="{{ asset('js/axios.min.js') }}"></script> 
-<script src="{{ asset('js/menu-edit.js') }}"></script> 
+<script src="{{ asset('js/site-menu-edit.js') }}"></script> 
 
 
 

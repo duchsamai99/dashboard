@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Slide extends Model
 {
-    protected $table = 'slides';
-    public $timestamps = false; 
+    protected $table = 'tbl_slides';
+    public $primaryKey = 'sliAutoID';
+    public $timestamps = false;  
 }

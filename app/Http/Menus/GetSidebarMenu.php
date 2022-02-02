@@ -8,6 +8,10 @@ namespace App\Http\Menus;
 use App\MenuBuilder\MenuBuilder;
 use Illuminate\Support\Facades\DB;
 use App\Models\Menus;
+use App\Models\SiteMenu;
+use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\App;
+use App\MenuBuilder\RenderFromDatabaseDataSiteMenu;
 use App\MenuBuilder\RenderFromDatabaseData;
 
 class GetSidebarMenu implements MenuInterface{
@@ -20,11 +24,25 @@ class GetSidebarMenu implements MenuInterface{
     }
 
     private function getMenuFromDB($menuId, $menuName){
-        $this->menu = Menus::join('menu_role', 'menus.id', '=', 'menu_role.menus_id')
+        $current_user = auth()->user();
+        $menu_role = $current_user->menuroles;
+        $role = Role::where('name',$menu_role )->first();
+        if($current_user->type == 1){
+            $this->menu = Menus::join('tbl_admin_menu_roles', 'menus.id', '=', 'tbl_admin_menu_roles.amrMenusID')
             ->select('menus.*')
             ->where('menus.menu_id', '=', $menuId)
-            ->where('menu_role.role_name', '=', $menuName)
-            ->orderBy('menus.sequence', 'asc')->get();       
+            ->where('tbl_admin_menu_roles.amrRoleName', '=', $role->name)
+            // ->where('tbl_admin_menu_roles.amrView', '=', 1)
+            ->orderBy('menus.id', 'asc')->distinct()->get();   
+        }else{
+            $this->menu = Menus::join('tbl_admin_menu_roles', 'menus.id', '=', 'tbl_admin_menu_roles.amrMenusID')
+            ->select('menus.*')
+            ->where('menus.menu_id', '=', $menuId)
+            ->where('tbl_admin_menu_roles.amrRoleName', '=', $role->name)
+            ->where('tbl_admin_menu_roles.amrView', '=', 1)
+            ->orderBy('menus.id', 'asc')->distinct()->get();   
+        }
+            
     }
 
     private function getGuestMenu( $menuId ){
@@ -39,7 +57,7 @@ class GetSidebarMenu implements MenuInterface{
         $this->getMenuFromDB($menuId, 'admin');
     }
 
-    public function get($role, $menuId=2){
+    public function get($role, $menuId=1){
         $this->getMenuFromDB($menuId, $role);
         $rfd = new RenderFromDatabaseData;
         return $rfd->render($this->menu);
@@ -59,11 +77,25 @@ class GetSidebarMenu implements MenuInterface{
         */
     }
 
-    public function getAll( $menuId=2 ){
+    public function getAll( $menuId=1 ){
         $this->menu = Menus::select('menus.*')
             ->where('menus.menu_id', '=', $menuId)
-            ->orderBy('menus.sequence', 'asc')->get();  
+            ->orderBy('menus.id', 'asc')->get();  
         $rfd = new RenderFromDatabaseData;
+        return $rfd->render($this->menu);
+    }
+
+        // $socials = DB::table('tbl_socials')->where('socLang', $language)->get();
+        // return view('default.socials.index', array(
+        //     'socials'  => $socials
+        // ));
+    public function getAllSiteMenu( $menuId=2 ){
+        $language = App::getLocale();
+        $this->menu = SiteMenu::select('tbl_site_menus.*')
+            // ->where('tbl_site_menus.smeMenu_id', '=', 2)
+            ->where('tbl_site_menus.smeLang', '=', $language)
+            ->orderBy('tbl_site_menus.sequence', 'asc')->get();  
+        $rfd = new RenderFromDatabaseDataSiteMenu;
         return $rfd->render($this->menu);
     }
 }

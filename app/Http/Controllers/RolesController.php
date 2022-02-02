@@ -3,14 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Illuminate\Support\Facades\DB;
+use App\Http\Menus\PermissionMenu;
 use App\Models\Menurole;
+use App\Models\Action;
+use App\Models\AdminMenuRole;
 use App\Models\RoleHierarchy;
 
 class RolesController extends Controller
 {
+    public function __construct(Request $request)
+    {
+        $this->middleware('auth');
+        session(['role_menu_id' => $request->current_menu_id]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -74,23 +84,40 @@ class RolesController extends Controller
      */
     public function store(Request $request)
     {
-        $role = new Role();
-        $role->name = $request->input('name');
-        $role->save();
-        $hierarchy = RoleHierarchy::select('hierarchy')
-        ->orderBy('hierarchy', 'desc')->first();
-        if(empty($hierarchy)){
-            $hierarchy = 0;
-        }else{
-            $hierarchy = $hierarchy['hierarchy'];
-        }
-        $hierarchy = ((integer)$hierarchy) + 1;
-        $roleHierarchy = new RoleHierarchy();
-        $roleHierarchy->role_id = $role->id;
-        $roleHierarchy->hierarchy = $hierarchy;
-        $roleHierarchy->save();
-        $request->session()->flash('message', 'Successfully created role');
-        return redirect()->route('roles.create');
+        $permission_action = new PermissionMenu();
+		$permission_menu = $permission_action->permission(session('role_menu_id'), null, "insert");
+		if($permission_menu['status'] == true){
+            $role = new Role();
+            $role->name = $request->input('name');
+            $role->save();
+            $array_actions = ['Insert', 'View', 'Edit', 'Delete'];
+            foreach($array_actions as $value){
+                $action = new Action();
+                $action->actRoleID = $role->id;
+                $action->actName   = $value;
+                $action->actValue  = 0;
+                $action->save();
+
+            }
+
+            $hierarchy = RoleHierarchy::select('hierarchy')
+            ->orderBy('hierarchy', 'desc')->first();
+            if(empty($hierarchy)){
+                $hierarchy = 0;
+            }else{
+                $hierarchy = $hierarchy['hierarchy'];
+            }
+            $hierarchy = ((integer)$hierarchy) + 1;
+            $roleHierarchy = new RoleHierarchy();
+            $roleHierarchy->role_id = $role->id;
+            $roleHierarchy->hierarchy = $hierarchy;
+            $roleHierarchy->save();
+            $request->session()->flash('message_success', $permission_menu['message']);
+			return redirect()->route('roles.index');
+		}else{
+			$request->session()->flash("message_fail", $permission_menu['message']);
+			return redirect()->route('roles.create');
+		}
     }
 
     /**
@@ -128,11 +155,19 @@ class RolesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $role = Role::where('id', '=', $id)->first();
-        $role->name = $request->input('name');
-        $role->save();
-        $request->session()->flash('message', 'Successfully updated role');
-        return redirect()->route('roles.edit', $id); 
+        $permission_action = new PermissionMenu();
+		$permission_menu = $permission_action->permission(session('role_menu_id'), null,"update");
+		if($permission_menu['status'] == true){
+            $role = Role::where('id', '=', $id)->first();
+            $role->name = $request->input('name');
+            $role->save();
+            
+            $request->session()->flash("message_success", $permission_menu['message']);
+            return redirect()->route('roles.index');
+		}else{
+			$request->session()->flash("message_fail", $permission_menu['message']);
+			return redirect()->route('roles.edit', $id); 
+		}
     }
 
     /**
@@ -143,19 +178,25 @@ class RolesController extends Controller
      */
     public function destroy($id, Request $request)
     {
-        $role = Role::where('id', '=', $id)->first();
-        $roleHierarchy = RoleHierarchy::where('role_id', '=', $id)->first();
-        $menuRole = Menurole::where('role_name', '=', $role->name)->first();
-        if(!empty($menuRole)){
-            $request->session()->flash('message', "Can't delete. Role has assigned one or more menu elements.");
-            $request->session()->flash('back', 'roles.index');
-            return view('dashboard.layouts.universal-info');
-        }else{
-            $role->delete();
-            $roleHierarchy->delete();
-            $request->session()->flash('message', "Successfully deleted role");
-            $request->session()->flash('back', 'roles.index');
-            return view('dashboard.layouts.universal-info');
-        }
+        $permission_action = new PermissionMenu();
+		$permission_menu = $permission_action->permission(session('role_menu_id'), null,"delete");
+		if($permission_menu['status'] == true){
+            $role = Role::where('id', '=', $id)->first();
+            $roleHierarchy = RoleHierarchy::where('role_id', '=', $id)->first();
+            $menuRole = AdminMenuRole::where('amrRoleName', '=', $role->name)->first();
+            if(!empty($menuRole)){
+                $request->session()->flash('message_fail', "Can't delete. Role has assigned one or more admin menus.");
+                return redirect()->route('roles.index');
+            }else{
+                $role->delete();
+                $roleHierarchy->delete();
+                $request->session()->flash("message_success", $permission_menu['message']);
+                return redirect()->route('roles.index');
+            }
+               
+		}else{
+			$request->session()->flash("message_fail", $permission_menu['message']);
+			return redirect()->route('roles.index'); 
+		}
     }
 }

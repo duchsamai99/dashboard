@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'welcome' => 'Welcome to our application!ooooo111',
+    'welcome' => 'Slide lists',
 ];

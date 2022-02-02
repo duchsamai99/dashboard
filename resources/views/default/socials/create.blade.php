@@ -17,43 +17,17 @@
           <div class="card">
             <div class="card-header"><h4>Create new social</h4></div>
               <div class="card-body">
-                @if(Session::has('message'))
-                    <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
+                @if(Session::has('message_success'))
+                  <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+                @elseif(Session::has('message_fail'))
+                  <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
                 @endif
                 <form id="submit">
                   <div class="row">
                     <div class="col-xs-6 col-sm-6 col-md-6">
                       <div class="form-group">
-                        <span class="text-secondary">Title:</span>
-                        <input type="text" name="socTitle" id="socTitle" class="form-control" placeholder="Title">
-                      </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-6 col-md-6">
-                      <div class="form-group">
-                        <span class="text-secondary">Image:</span>
-                        <input type="file" name="socImage" id="socImage" class="form-control image" placeholder="Social Image">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6">
-                      <div class="form-group">
-                        <span class="text-secondary">Follower:</span>
-                        <input type="text" name="socFollower" id="socFollower" class="form-control" placeholder="Follower">
-                      </div>   
-                    </div>  
-                    <div class="col-xs-6 col-sm-6 col-md-6">
-                      <div class="form-group">
-                        <span class="text-secondary">Sign:</span>
-                        <input type="text" name="socSign" id="socSign" class="form-control" placeholder="Sign">
-                      </div>   
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6">
-                      <div class="form-group">
-                        <span class="text-secondary">Order:</span>
-                        <input type="number" name="socOrder" id="socOrder" class="form-control" placeholder="Order">
+                        <span>Title:</span>
+                        <input type="text" name="socTitle" id="socTitle" class="form-control" placeholder="Title" required>
                       </div>
                     </div>
                     <div class="col-xs-6 col-sm-6 col-md-6">
@@ -69,12 +43,42 @@
                   <div class="row">
                     <div class="col-xs-6 col-sm-6 col-md-6">
                       <div class="form-group">
-                        <span class="text-secondary">Description:</span>
+                        <span>Follower:</span>
+                        <input type="text" name="socFollower" id="socFollower" class="form-control" placeholder="Follower" required>
+                      </div>   
+                    </div>  
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <span>Sign:</span>
+                        <input type="text" name="socSign" id="socSign" class="form-control" placeholder="Sign" required>
+                      </div>   
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <span>Description:</span>
                         <textarea class="form-control" type="text" id="socDescription" name="socDescription"></textarea>
+                      </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <span>Image:</span>
+                        <input type="file" name="socImage" id="socImage" class="form-control image" placeholder="Social Image">
+                        <br>
+                        <img src="" id="preview_image">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <span>Order:</span>
+                        <input type="number" name="socOrder" id="socOrder" class="form-control" placeholder="Order" required>
                       </div>   
                     </div>  
                   </div>
-                  <button class="btn btn-info"type="submit">Save</button>
+                  <button class="btn btn-info"type="submit">Create</button>
                   <a class="btn text-white btn-warning" href="{{ route('socials.index') }}">Return</a>
                 
                 </form>
@@ -177,8 +181,8 @@
 
   $modal.on('shown.bs.modal', function () {
       cropper = new Cropper(image, {
-      aspectRatio: 1,
-      viewMode: 3,
+      // aspectRatio: 1,
+      // viewMode: 3,
       preview: '.preview'
       });
   }).on('hidden.bs.modal', function () {
@@ -203,9 +207,9 @@
                   url: "/socials/crop",
                   data: {'_token': $('meta[name="_token"]').attr('content'), 'socImage': base64data},
                   success: function(data){
-                  getData = data;
-                    console.log(data);
                       $modal.modal('hide');
+                      getData = data;
+                      $('#preview_image').attr('src', '/uploads/'+getData.data);
                       // location.replace('/slides/create');
                   }
               });
@@ -226,7 +230,10 @@
     var socFollower= $("#socFollower").val();
     var socStatus= $("#socStatus").val();
     var socDescription= ed.getContent();
-    var socImage = getData;
+    var socImage = null;
+    if(getData != undefined){
+      socImage = getData.data
+    }
     $.ajax({
       url: "/socials",
       type:"POST",
@@ -239,16 +246,20 @@
         socFollower:socFollower,
         socSign:socSign,
         socStatus:socStatus,
-        socImage:socImage.data
+        socImage:socImage
       },
       success:function(response){
         console.log(response);
-        location.replace('/socials');
+        if(response == true){
+          location.replace('/socials');
+
+        }else{
+          location.replace('/socials/create');
+
+        }
       }
       });
   });
-  
-  
   
 </script>
 @endsection

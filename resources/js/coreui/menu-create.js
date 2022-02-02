@@ -1,17 +1,15 @@
-/* 11.12.2019 */
-
 let self = this;
 
 this.buildSelectParent = function( data ){
     let result = '<option value="none">Do not have parent</option>'
     for(let i = 0; i<data.length; i++){
-        result += '<option value="' + data[i].id + '">' + data[i].name + '</option>'
+        result += '<option value="' + data[i].id + '">' + data[i].name + 'gg</option>'
     }
     return result
 }
 
 this.updateSelectParent = function(){
-    axios.get('/menu/element/get-parentst?menu=' + document.getElementById("menu").value )
+    axios.get('/menu/get-parentst?menu=' + document.getElementById("menu").value )
     .then(function (response) {
         document.getElementById("parent").innerHTML = self.buildSelectParent(response.data)
     })

@@ -45,7 +45,7 @@
             </div>
             <div class="logo-background card text-whitepy-5 d-md-down-none" style="width:44%">
               <div class="card-body text-center">
-                <div class="c-avatar"><img class="logo" width="300" height="150" src="/uploads/amtak_logo.jpg" alt="logo"></div>
+                <div class="c-avatar"><img class="logo" width="300" height="150" src="/uploads/site_descriptions/amatak_logo.jpg" alt="logo"></div>
                 <p class="text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
               </div>
             </div>

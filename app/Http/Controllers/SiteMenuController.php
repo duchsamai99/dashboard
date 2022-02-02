@@ -2,28 +2,46 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\SiteMenu;
 use Illuminate\Http\Request;
-use App\Models\Menurole;    
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Validation\Rule;
+use App\Models\AdminMenuRole;
+use App\Models\Menurole;  
+use App\Models\MenuRoleSiteMenu;    
+use App\Models\SiteMenu;    
 use App\Http\Menus\GetSidebarMenu;
 use App\Models\Menulist;
 use App\Models\Menus;
-use Illuminate\Validation\Rule;
+use App\Models\Action;
 use App\Services\RolesService;
+use App\Services\RolesServiceSiteMenu;
+use App\Http\Menus\PermissionMenu;
+use Spatie\Permission\Models\Role;
+
+
 class SiteMenuController extends Controller
 {
-     /**
+    /**
      * Create a new controller instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Request $request)
     {
         $this->middleware('auth');
-        $this->middleware('admin');
+        session(['site_menu_id' => $request->current_menu_id]);
     }
 
     public function index(Request $request){
+        // $language = App::getLocale();
+        // $slides = DB::table('tbl_slides')->where('sliLang', $language)->get();
+        // return view('project.slides.index', array(
+        //     'slides'  => $slides
+        // ));
+
         if($request->has('menu')){
             $menuId = $request->input('menu');
         }else{
@@ -39,7 +57,7 @@ class SiteMenuController extends Controller
             'menulist'      => Menulist::all(),
             'role'          => 'admin',
             'roles'         => RolesService::get(),
-            'menuToEdit'    => $getSidebarMenu->getAll( $menuId ),
+            'menuToEdit'    => $getSidebarMenu->getAllSiteMenu( $menuId ),
             'thisMenu'      => $menuId,
         ));
     }
@@ -56,7 +74,7 @@ class SiteMenuController extends Controller
             $element->save();
             $switchElement->save();
         }
-        return redirect()->route('menu.index', ['menu' => $element->menu_id ]);
+        return redirect()->route('site.menu.index', ['menu' => $element->menu_id ]);
     }
 
     public function moveDown(Request $request){
@@ -71,21 +89,24 @@ class SiteMenuController extends Controller
             $element->save();
             $switchElement->save();
         }
-        return redirect()->route('menu.index', ['menu' => $element->menu_id ]);
+        return redirect()->route('site.menu.index', ['menu' => $element->menu_id ]);
     }
     public function getParents(Request $request){
+        $language = App::getLocale();
         $menuId = $request->input('menu');
-        $result = Menus::where('menus.menu_id', '=', $menuId)
-            ->where('menus.slug', '=', 'dropdown')
-            ->orderBy('menus.sequence', 'asc')->get();
+        $result = SiteMenu::where('smeMenu_id', '=', $menuId)
+            ->where('smeSlug', '=', 'dropdown')
+            ->where('smeLang', '=', $language)
+            ->orderBy('smeAutoID', 'asc')->get();
         return response()->json(
             $result
         ); 
     }
     public function create(){
         return view('default.site_menus.create',[
-            'roles'    => RolesService::get(),
-            'menulist' => Menulist::all(),
+            'roles'    => RolesServiceSiteMenu::get(),
+            'menulist' => Menulist::all()
+
         ]);
     }
 
@@ -112,125 +133,136 @@ class SiteMenuController extends Controller
         }
         return $result;
     }
-    // $table->bigIncrements('smeAutoID');
-    // $table->integer('smeID')->unsigned();
-    // $table->integer('sme_smeAutoID')->nullable();
-    // $table->string('smeLang');
-    // $table->string('smeName');
-    // $table->string('smePageName');
-    // $table->integer('smeOrder');
-    // $table->integer('smeStatus')->default(0);
-    // $table->string('smeHref')->nullable();
-    // $table->string('smeIcon')->nullable();
-    // $table->string('smeSlug');
-    // $table->integer('smeParent_id')->unsigned()->nullable();
-    // $table->integer('smeMenu_id')->unsigned();
-    // $table->timestamps();
+
     public function store(Request $request){
-        $validatedData = $request->validate($this->getValidateArray());
-        $menus = new SiteMenu();
-        //$menus->smeStatus = $request->input('type');
-        $menus->smePageName = '/slide/edit';
-        $menus->smeLang = 'en';
-        $menus->smeID = 1;
-        $menus->smeOrder = 1;
-        $menus->smeSlug = $request->input('type');
-        $menus->smeMenu_id = $request->input('menu');
-        $menus->smeName = $request->input('name');
-        if(strlen($request->input('icon')) > 0){
-            $menus->smeIcon = $request->input('icon');
-        }
-        if(strlen($request->input('href')) > 0){
-            $menus->smeHref = $request->input('href');
-        }
-        if($request->input('type') !== 'title' && $request->input('parent') !== 'none'){
-            $menus->smeParent_id = $request->input('parent');
-        }
-        $menus->sequence = $this->getNextSequence( $request->input('menu') );
-        $menus->save();
-        foreach($request->input('role') as $role){
-            $menuRole = new Menurole();
-            $menuRole->role_name = $role;
-            $menuRole->menus_id = $menus->id;
-            $menuRole->save();
-        }
-        $request->session()->flash('message', 'Successfully created menu element');
-        return redirect()->route('menu.create'); 
+        $permission_action = new PermissionMenu();
+		$permission_menu = $permission_action->permission(session('site_menu_id'), null, "insert");
+		if($permission_menu['status'] == true){
+            $languages = Config::get('languages');
+            $site_menu_last = SiteMenu::all()->last();
+            $smeID = 0;
+            if($site_menu_last == null){
+                $smeID = 1;
+            }else{
+                $smeID = $site_menu_last->smeID + 1;
+            }
+            foreach($languages as $language){
+                $menus = new SiteMenu();
+                $menus->smePageName = '/pages';
+                $menus->smeLang = $language['value'];
+                $menus->smeID = $smeID;
+                $menus->smeOrder = 1;
+                $menus->smeSlug = $request->input('type');
+                $menus->smeMenu_id = $request->input('menu');
+                $menus->smeName = $request->input('name');
+                if(strlen($request->input('icon')) > 0){
+                    $menus->smeIcon = $request->input('icon');
+                }
+                if(strlen($request->input('href')) > 0){
+                    $menus->smeHref = $request->input('href');
+                }
+                //if($request->input('type') !== 'title' && $request->input('parent') !== 'none'){
+                $menus->smeParent_id = $request->input('parent');
+                //}
+                $menus->sequence = $this->getNextSequence( $request->input('menu') );
+                $menus->save();
+            }
+            
+            $request->session()->flash('message_success', $permission_menu['message']);
+			return redirect()->route('site.menu.index');
+		}else{
+			$request->session()->flash("message_fail", $permission_menu['message']);
+			return redirect()->route('site.menu.create');
+		}
     }
 
     public function edit(Request $request){
-
-
+        $site_menu_by_autoId = SiteMenu::where('smeAutoID', '=', $request->input('id'))->first();
+        $language = App::getLocale();
+        $site_menu = DB::table('tbl_site_menus')->where('smeLang', $language)->where('smeID', $site_menu_by_autoId->smeID)->first();
+        $menu_lists = Menulist::all();
+        $menu_roles = MenuroleSiteMenu::where('merMenusID', '=', $site_menu_by_autoId->smeID)->get();
         return view('default.site_menus.edit',[
-            'roles'    => RolesService::get(),
-            'menulist' => Menulist::all(),
-            'menuElement' => Menus::where('id', '=', $request->input('id'))->first(),
-            'menuroles' => Menurole::where('menus_id', '=', $request->input('id'))->get()
+            'menulist' => $menu_lists,
+            'menuElement' => $site_menu,
+            'menuroles' => $menu_roles,
         ]);
     }
 
     public function update(Request $request){
-
-        //var_dump( $_POST );
-        //die();
-
-        $validatedData = $request->validate($this->getValidateArray());
-
-        //var_dump( $_POST );
-       //die();
-
-        $menus = Menus::where('id', '=', $request->input('id'))->first();
-        $menus->slug = $request->input('type');
-        $menus->menu_id = $request->input('menu');
-        $menus->icon = $request->input('icon');
-        $menus->href = $request->input('href');
-        $menus->name = $request->input('name');
-        if($request->input('type') === 'title' || $request->input('parent') === 'none' ){
-            $menus->parent_id = NULL;
-        }else{
-            if($request->input('parent') === $request->input('id')){ //can't be self parent
-                $menus->parent_id = NULL;
-            }else{
-                $menus->parent_id = $request->input('parent');
+        $permission_action = new PermissionMenu();
+		$permission_menu = $permission_action->permission(session('site_menu_id'), null,"update");
+		if($permission_menu['status'] == true){
+            $menus = SiteMenu::where('smeAutoID', '=', $request->input('id'))->first();
+            $menus->smeAutoID = $request->input('id');
+            $menus->smePageName = "/page";
+            $menus->smeLang = $menus->smeLang;
+            $menus->smeID = $menus->smeID;
+            $menus->smeOrder = $menus->smeOrder;
+            $menus->smeSlug = $request->input('type');
+            $menus->smeMenu_id = $request->input('menu');
+            $menus->smeName = $request->input('name');
+            if(strlen($request->input('icon')) > 0){
+                $menus->smeIcon = $request->input('icon');
             }
-        }
-        $menus->save();
-        Menurole::where('menus_id', '=', $request->input('id'))->delete();
-        if($request->has('role')){
-            foreach($request->input('role') as $role){
-                $menuRole = new Menurole();
-                $menuRole->role_name = $role;
-                $menuRole->menus_id = $request->input('id');
-                $menuRole->save();
+            if(strlen($request->input('href')) > 0){
+                $menus->smeHref = $request->input('href');
             }
-        }
-        $request->session()->flash('message', 'Successfully update menu element');
-        return redirect()->route('menu.edit', ['id'=>$request->input('id')]); 
+            //if($request->input('type') !== 'title' && $request->input('parent') !== ''){
+            $menus->smeParent_id = $request->input('parent');
+            //}
+            $menus->save();
+            $site_menu_by_autoId = SiteMenu::where('smeAutoID', '=', $request->input('id'))->first();
+            MenuroleSiteMenu::where('merMenusID', '=', $site_menu_by_autoId->smeID)->delete();
+            $request->session()->flash('message_success', $permission_menu['message']);
+			return redirect()->route('site.menu.index');
+		}else{
+			$request->session()->flash("message_fail", $permission_menu['message']);
+			return redirect()->route('site.menu.edit', ['id'=>$request->input('id')]);
+		}
+
     }
 
     public function show(Request $request){
-        $menuElement = Menus::join('menus as mparent', 'menus.parent_id', '=', 'mparent.id')
-        ->select('menus.*', 'mparent.name as parent_name')
-        ->where('menus.id', '=', $request->input('id'))->first();
+        $menu_element_by_autoId = SiteMenu::where('smeAutoID', '=', $request->input('id'))->first();
+        $language = App::getLocale();
+        $menuElement = SiteMenu::join('tbl_site_menus as mparent', 'tbl_site_menus.smeParent_id', '=', 'mparent.smeAutoID')
+        ->select('tbl_site_menus.*', 'mparent.smeName as parent_name')
+        ->where('tbl_site_menus.smeLang', '=', $language)
+        ->where('tbl_site_menus.smeID', '=', $menu_element_by_autoId->smeID)->first();
         if(empty($menuElement)){
-            $menuElement = Menus::where('id', '=', $request->input('id'))->first();
+            $menuElement = SiteMenu::where('smeID', '=', $menu_element_by_autoId->smeID)
+            ->where('smeLang', '=', $language)
+            ->first();
         }
+        $menuId = $menuElement->smeID;
+        $menu_roles = MenuroleSiteMenu::where('merMenusID', '=', $menuId)->get();
         return view('default.site_menus.show',[
             'menulist' => Menulist::all(),
             'menuElement' => $menuElement,
-            'menuroles' => Menurole::where('menus_id', '=', $request->input('id'))->get()
+            'menuroles' => $menu_roles
         ]);
+       
     }
 
     public function delete(Request $request){
-        $menus = Menus::where('id', '=', $request->input('id'))->first();
-        $menuId = $menus->menu_id;
-        $menus->delete();
-        Menurole::where('menus_id', '=', $request->input('id'))->delete();
-        $request->session()->flash('message', 'Successfully deleted menu element');
-        $request->session()->flash('back', 'menu.index');
-        $request->session()->flash('backParams', ['menu' => $menuId]);
-        return view('dashboard.layouts.universal-info');
+        $permission_action = new PermissionMenu();
+		$permission_menu = $permission_action->permission(session('site_menu_id'), null,"delete");
+		if($permission_menu['status'] == true){
+            $menus = SiteMenu::where('smeAutoID', '=', $request->input('id'))->first();
+            $menuId = $menus->merMenusID;
+            $smeID = $menus->smeID;
+            SiteMenu::where('smeID', '=', $menus->smeID)->delete();
+
+            $menus->delete();
+            MenuroleSiteMenu::where('merMenusID', '=', $smeID)->delete();
+            $request->session()->flash('message_success', $permission_menu['message']);
+            return redirect()->route('site.menu.index');
+        }else{
+			$request->session()->flash("message_fail", $permission_menu['message']);
+			return redirect()->route('site.menu.index'); 
+		}
+
     }
 
 }

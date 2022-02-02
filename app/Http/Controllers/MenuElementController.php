@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 //use App\Services\EditMenuViewService;
 use App\Models\Menurole;    
 use App\Http\Menus\GetSidebarMenu;
+use App\Http\Permissions\PermissionMenu;
 use App\Models\Menulist;
 use App\Models\Menus;
+use App\Models\AdminMenuRole;
 use Illuminate\Validation\Rule;
 use App\Services\RolesService;
 
@@ -21,7 +23,7 @@ class MenuElementController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('admin');
+        // $this->middleware('admin');
     }
 
     public function index(Request $request){
@@ -142,6 +144,36 @@ class MenuElementController extends Controller
     }
 
     public function edit(Request $request){
+        $site_menu_by_autoId = SiteMenu::where('smeAutoID', '=', $request->input('id'))->first();
+        $language = App::getLocale();
+        //$site_menu = DB::table('tbl_site_menus')->where('smeLang', $language)->where('smeID', $site_menu_by_autoId->smeID)->first();
+        $roles = RolesService::get();
+        $get_role_without_menu_roles = [];
+        $get_role_menu_roles = [];
+        $menu_lists = Menulist::all();
+        $actions = Action::all();
+        $menu_roles = AdminMenuRole::where('amrMenusID', '=', $request->input('id'))->get();
+        foreach($roles as $role){
+            $menu_role = AdminMenuRole::where('amrMenusID', '=', $request->input('id'))->where('amrRoleID', '=', $role->id)->get();
+            if(count($menu_role) ==0){
+                $role_withou_menu_role = Role::where('id', '=', $role->id)->first();
+                array_push( $get_role_without_menu_roles, $role_withou_menu_role);
+
+            }else{
+                $role_menu_role = Role::where('id', '=', $role->id)->first();
+                array_push( $get_role_menu_roles, $role_menu_role);
+            }
+        }
+        return view('default.admin_menus.edit',[
+            'get_role_menu_roles'    => $get_role_menu_roles,
+            'menulist' => $menu_lists,
+            'actions' => $actions,
+            'menuElement' => $site_menu_by_autoId,
+            'menuroles' => $menu_roles,
+            'get_role_without_menu_roles' => $get_role_without_menu_roles
+        ]);
+    }
+    public function edit1(Request $request){
 
 
         return view('default.admin_menus.edit',[
@@ -177,6 +209,7 @@ class MenuElementController extends Controller
                 $menus->parent_id = $request->input('parent');
             }
         }
+        dd($menus);
         $menus->save();
         Menurole::where('menus_id', '=', $request->input('id'))->delete();
         if($request->has('role')){
@@ -188,7 +221,7 @@ class MenuElementController extends Controller
             }
         }
         $request->session()->flash('message', 'Successfully update menu element');
-        return redirect()->route('menu.edit', ['id'=>$request->input('id')]); 
+        //return redirect()->route('menu.edit', ['id'=>$request->input('id')]); 
     }
 
     public function show(Request $request){

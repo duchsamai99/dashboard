@@ -8,12 +8,11 @@
     <div class="row">
       <div class="col-sm-12">
         <div class="card">
-          <div class="card-header"><h4>Show menu element</h4></div>
+          <div class="card-header"><h4>Show site menu</h4></div>
             <div class="card-body">
                 @if(Session::has('message'))
                     <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
                 @endif
-
                     <table class="table table-striped table-bordered datatable">
                         <tbody>
                             <tr>
@@ -22,7 +21,7 @@
                                 </th>
                                 <td>
                                     @foreach($menulist as $menu1)
-                                        @if($menu1->id == $menuElement->menu_id  )
+                                        @if($menu1->id == $menuElement->smeMenu_id  )
                                             {{ $menu1->name }}
                                         @endif
                                     @endforeach
@@ -30,28 +29,10 @@
                             </tr>
                             <tr>
                                 <th>
-                                    User Roles
-                                </th>
-                                <td>
-                                    <?php
-                                        $first = true;
-                                        foreach($menuroles as $menurole){
-                                            if($first === true){
-                                                $first = false;
-                                            }else{
-                                                echo ', ';
-                                            }
-                                            echo $menurole->role_name;
-                                        }
-                                    ?>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
                                     Type
                                 </th>
                                 <td>
-                                    {{ $menuElement->slug }}
+                                    {{ $menuElement->smeSlug }}
                                 </td>
                             </tr>
                             <tr>
@@ -59,7 +40,7 @@
                                     Href:
                                 </th>
                                 <td>
-                                    {{ $menuElement->href }}
+                                    {{ $menuElement->smeHref}}
                                 </td>
                             </tr>
                             <tr>
@@ -79,14 +60,14 @@
                                     Icon
                                 </th>
                                 <td>
-                                    <i class="{{ $menuElement->icon }}"></i>
+                                    <i class="{{ $menuElement->smeIcon }}"></i>
                                     &nbsp;&nbsp;&nbsp;&nbsp;
-                                    {{ $menuElement->icon }}
+                                    {{ $menuElement->smeIcon }}
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                    <a class="btn btn-primary" href="{{ route('site.menu.index', ['menu' => $menuElement->menu_id]) }}">Return</a>
+                    <a class="btn btn-warning text-white" href="{{ route('site.menu.index', ['menu' => $menuElement->smeMenu_id]) }}">Return</a>
             </div>
           </div>
         </div>
@@ -94,10 +75,8 @@
     </div>
   </div>
 </div>
-
 @endsection
 
 @section('javascript')
-
 
 @endsection

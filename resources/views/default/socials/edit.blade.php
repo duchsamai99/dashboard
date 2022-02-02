@@ -17,50 +17,24 @@
           <div class="card">
             <div class="card-header"><h4>Edit Slide</h4></div>
               <div class="card-body">
-                  @if(Session::has('message'))
-                      <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
-                  @endif
+                @if(Session::has('message_success'))
+                  <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+                @elseif(Session::has('message_fail'))
+                  <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
+                @endif
                 <form id="submit">
                   <div class="row">
                     <div class="col-xs-6 col-sm-6 col-md-6">
                       <div class="form-group">
-                        <span class="text-secondary">Title:</span>
-                        <input type="text" name="socTitle" id="socTitle" class="form-control" placeholder="Title" value="{{$social->socTitle}}">
-                      </div>
-                    </div>
-                    <div class="col-xs-6 col-sm-6 col-md-6">
-                      <div class="form-group">
-                        <span class="text-secondary">Image:</span>
-                        <input type="file" name="socImage" id="socImage" class="form-control image" placeholder="Social Image" >
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6">
-                      <div class="form-group">
-                        <span class="text-secondary">Follower:</span>
-                        <input type="text" name="socFollower" id="socFollower" class="form-control" placeholder="Follower" value="{{$social->socFollower}}">
-                      </div>   
-                    </div>  
-                    <div class="col-xs-6 col-sm-6 col-md-6">
-                      <div class="form-group">
-                        <span class="text-secondary">Sign:</span>
-                        <input type="text" name="socSign" id="socSign" class="form-control" placeholder="Sign" value="{{$social->socSign}}">
-                      </div>   
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-xs-6 col-sm-6 col-md-6">
-                      <div class="form-group">
-                        <span class="text-secondary">Order:</span>
-                        <input type="number" name="socOrder" id="socOrder" class="form-control" placeholder="Order" value="{{$social->socOrder}}">
+                        <span class="">Title:</span>
+                        <input type="text" name="socTitle" id="socTitle" class="form-control" placeholder="Title" value="{{$social->socTitle}}" required>
                       </div>
                     </div>
                     <div class="col-xs-6 col-sm-6 col-md-6">
                       <div class="form-group">
                         <span>Status</span>
                         <select class="form-control" name="socStatus" id="socStatus" aria-label="Default select example">
-                          @if( $social->socStatus== 1)
+                          @if( $social->socStatus== 0)
                             <option selected value="0">Active</option>
                             <option value="1">Inactive</option>
                           @else
@@ -69,18 +43,50 @@
                           @endif
                           
                         </select>
+                        
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-xs-6 col-sm-6 col-md-6">
                       <div class="form-group">
-                        <span class="text-secondary">Description:</span>
+                        <span class="">Follower:</span>
+                        <input type="text" name="socFollower" id="socFollower" class="form-control" placeholder="Follower" value="{{$social->socFollower}}" required>
+                      </div>   
+                    </div>  
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <span class="">Sign:</span>
+                        <input type="text" name="socSign" id="socSign" class="form-control" placeholder="Sign" value="{{$social->socSign}}" required>
+                      </div>   
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <span class="">Description:</span>
                         <textarea class="form-control" type="text" id="socDescription" name="socDescription">{{$social->socDescription}}</textarea>
+                      </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <span class="">Image:</span>
+                        <input type="file" name="socImage" id="socImage" value="{{$social->socImage}}" class="form-control image" placeholder="Social Image" >
+                        <br>
+                        <img src="/uploads/{{$social->socImage}}" id="preview_image">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-6">
+                      <div class="form-group">
+                        <span class="">Order:</span>
+                        <input type="number" name="socOrder" id="socOrder" class="form-control" placeholder="Order" value="{{$social->socOrder}}" required>
+                        
                       </div>   
                     </div>  
                   </div>
-                  <button class="btn btn-info"type="submit">Save</button>
+                  <button class="btn btn-info"type="submit">Update</button>
                   <a class="btn text-white btn-warning" href="{{ route('socials.index') }}">Return</a>
                 
                 </form>
@@ -157,66 +163,66 @@
   var cropper;
   var getData;
   $("#body").on("change", ".image", function(e){
-      var files = e.target.files;
-      var done = function (url) {
-        image.src = url;
-        $modal.modal('show');
-      };
-      var reader;
-      var file;
-      var url;
+    var files = e.target.files;
+    var done = function (url) {
+      image.src = url;
+      $modal.modal('show');
+    };
+    var reader;
+    var file;
+    var url;
 
-      if (files && files.length > 0) {
-        file = files[0];
+    if (files && files.length > 0) {
+      file = files[0];
 
-        if (URL) {
-          done(URL.createObjectURL(file));
-        } else if (FileReader) {
-          reader = new FileReader();
-          reader.onload = function (e) {
-            done(reader.result);
-          };
-          reader.readAsDataURL(file);
-        }
+      if (URL) {
+        done(URL.createObjectURL(file));
+      } else if (FileReader) {
+        reader = new FileReader();
+        reader.onload = function (e) {
+          done(reader.result);
+        };
+        reader.readAsDataURL(file);
       }
+    }
   });
 
   $modal.on('shown.bs.modal', function () {
-      cropper = new Cropper(image, {
-      aspectRatio: 1,
-      viewMode: 3,
+    cropper = new Cropper(image, {
+      // aspectRatio: 1,
+      // viewMode: 3,
       preview: '.preview'
-      });
+    });
   }).on('hidden.bs.modal', function () {
     cropper.destroy();
     cropper = null;
   });
 
   $("#crop").click(function(){
-      canvas = cropper.getCroppedCanvas({
-        width: 160,
-        height: 500,
-        });
-      canvas.toBlob(function(blob) {
-          url = URL.createObjectURL(blob);
-          var reader = new FileReader();
-          reader.readAsDataURL(blob); 
-          reader.onloadend = function() {
-              var base64data = reader.result;	
-              $.ajax({
-                  type: "POST",
-                  dataType: "json",
-                  url: "/socials/crop",
-                  data: {'_token': $('meta[name="_token"]').attr('content'), 'socImage': base64data},
-                  success: function(data){
-                  getData = data;
-                    console.log(data);
-                      $modal.modal('hide');
-                      // location.replace('/slides/create');
-                  }
-              });
+    canvas = cropper.getCroppedCanvas({
+      width: 160,
+      height: 500,
+    });
+    canvas.toBlob(function(blob) {
+      url = URL.createObjectURL(blob);
+      var reader = new FileReader();
+      reader.readAsDataURL(blob); 
+      reader.onloadend = function() {
+        var base64data = reader.result;	
+        $.ajax({
+          type: "POST",
+          dataType: "json",
+          url: "/socials/crop",
+          data: {'_token': $('meta[name="_token"]').attr('content'), 'socImage': base64data},
+          success: function(data){
+            console.log(data);
+            $modal.modal('hide');
+            getData = data;
+            $('#preview_image').attr('src', '/uploads/'+getData.data);
           }
-      });
+        });
+      }
+    });
   });
   tinymce.init({
     selector: 'textarea#socDescription',
@@ -232,7 +238,10 @@
     var socFollower= $("#socFollower").val();
     var socStatus= $("#socStatus").val();
     var socDescription= ed.getContent();
-    var socImage = getData;
+    var socImage = "{{$social->socImage }}";
+    if(getData != undefined){
+      socImage = getData.data
+    }
     $.ajax({
       url: "/socials/{{ $social->socAutoID }}",
       type:"PUT",
@@ -245,13 +254,17 @@
         socFollower:socFollower,
         socSign:socSign,
         socStatus:socStatus,
-        socImage:socImage.data
+        socImage:socImage
       },
       success:function(response){
-        console.log(response);
-        location.replace('/socials');
+        if(response == true){
+          location.replace('/socials');
+        }else{
+          location.replace('/socials/{{ $social->socAutoID }}/edit');
+
+        }
       }
-      });
+    });
   });
   
   

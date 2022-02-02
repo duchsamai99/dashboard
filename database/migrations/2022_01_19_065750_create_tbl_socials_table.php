@@ -18,10 +18,10 @@ class CreateTblSocialsTable extends Migration
             $table->integer('socID')->unsigned();
             $table->string('socLang');
             $table->string('socTitle');
-            $table->string('socImage');
+            $table->string('socImage')->nullable();;
             $table->string('socFollower');
             $table->string('socSign');
-            $table->string('socDescription');
+            $table->string('socDescription')->nullable();
             $table->integer('socOrder');
             $table->integer('socStatus')->default(0);
             $table->timestamps();

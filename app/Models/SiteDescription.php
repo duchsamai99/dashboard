@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SiteDescription extends Model
 {
-    protected $table = 'site_description';
+    protected $table = 'tbl_site_descriptions';
+    public $primaryKey = 'sitAutoID';
     public $timestamps = false; 
 }

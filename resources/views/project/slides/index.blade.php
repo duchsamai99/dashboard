@@ -8,9 +8,14 @@
         <div class="card">
             <div class="card-header"><h4>{{__('messages.welcome')}}</h4></div>
             <div class="card-body">
-                <div class="row mb-3 ml-3">
+                <div class="row mb-3 ml-1">
                     <a class="btn btn-lg btn-info" href="{{ route('slides.create') }}">Add new sidebar menu</a>
                 </div>
+                @if(Session::has('message_success'))
+                  <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+                @elseif(Session::has('message_fail'))
+                  <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
+                @endif
                 <table class="table table-striped table-bordered datatable">
                     <thead>
                         <tr>
@@ -27,23 +32,23 @@
                     </thead>
                     <tbody>  
                         @foreach($slides as $slide)
-                            <form action="{{route('slides.delete', $slide->id)}}" method="POST" enctype="multiple/form-data">
+                            <form action="{{route('slides.delete', ['sliAutoID' => $slide->sliAutoID])}}" method="POST" enctype="multiple/form-data">
                                 {{method_field('delete')}}
                                 {{csrf_field()}}    
-                                <div id="ModalDelete{{$slide->id}}" class="modal fade" role="dialog" tabindex="-1" aria-hidden="true">
+                                <div id="ModalDelete{{$slide->sliAutoID}}" class="modal fade" role="dialog" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog" style="width:55%" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h4 class="modal-title">{{__('Slide Delete')}}</h4>
-                                                <button type="button" class="close">×</button>
+                                                <h4 class="modal-title">{{__('Confirmation message')}}</h4>
+                                                <button type="button" data-dismiss="modal" class="close">×</button>
                                             </div>
                                             <div class="modal-body">
-                                                <h4>You Want You Sure Delete This Record?</h4>
-                                                <input type="hidden" name="id" value="{{$slide->id}}">
+                                                <p>Do you want to delete this record?</p>
+                                                <input type="hidden" name="id" value="{{$slide->sliAutoID}}">
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn gray btn-outline-secondary" data-dismiss="modal">Close</button>
-                                                <button type="submit" class="btn gray btn-outline-danger">Delete</button>
+                                                <button type="button" class="btn text-white btn-warning" data-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-info">Delete</button>
                                             </div>
                                         </div>
                                     </div>
@@ -52,7 +57,7 @@
                                 <!--  -->
                             <tr>
                                 <td>
-                                    {{ $slide->id }}
+                                    {{ $slide->sliAutoID }}
                                 </td>
                                 <td>
                                     {{ $slide->sliName }}
@@ -68,21 +73,21 @@
                                     {{ $slide->sliOrder }}
                                 </td>
                                 <td>
-                                    {!! $slide->description !!}
+                                    {!! $slide->sliDescription !!}
                                 </td>
                                 <td>
                                     <img src="/uploads/{{$slide->sliImage }}" alt="hh">
                                 </td>
                                 <td>
-                                    <a class="btn btn-info" href="{{ route('slides.show', ['id' => $slide->id] ) }}">View</a>
+                                    <a class="btn btn-info" href="{{ route('slides.show', ['sliAutoID' => $slide->sliAutoID] ) }}">View</a>
                                 </td>
                                 <td>
-                                    <a class="btn btn-warning" href="{{ route('slides.edit', ['id' => $slide->id] ) }}">Edit</a>
+                                    <a class="btn btn-warning text-white" href="{{ route('slides.edit', ['sliAutoID' => $slide->sliAutoID] ) }}">Edit</a>
 
                                 </td>
                                 <td>
-                                <a class="btn btn-danger" id="submit" data-id="{{$slide->id}}" data-toggle="modal" data-target="#ModalDelete{{$slide->id}}">Delete</a>
-                                    <!-- <a class="btn btn-danger" href="{{ route('slides.delete', ['id' => $slide->id] ) }}">Delete</a> -->
+                                <a class="btn btn-danger text-white" id="submit" data-id="{{$slide->sliAutoID}}" data-toggle="modal" data-target="#ModalDelete{{$slide->sliAutoID}}">Delete</a>
+                                    <!-- <a class="btn btn-danger" href="{{ route('slides.delete', ['sliAutoID' => $slide->sliAutoID] ) }}">Delete</a> -->
                                 </td>
                             </tr>
                         @endforeach

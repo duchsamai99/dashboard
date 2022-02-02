@@ -19,7 +19,7 @@ class CreateTblTitlesTable extends Migration
             $table->string('titLang');
             $table->string('titTitle');
             $table->string('titAlias');
-            $table->string('titDescription');
+            $table->string('titDescription')->nullable();;
             $table->integer('titStatus')->default(0);
             $table->timestamps();
         });

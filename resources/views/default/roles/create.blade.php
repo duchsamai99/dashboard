@@ -7,9 +7,11 @@
         <div class="card">
           <div class="card-header"><h4>Create new role</h4></div>
             <div class="card-body">
-                @if(Session::has('message'))
-                    <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
-                @endif
+              @if(Session::has('message_success'))
+                <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+              @elseif(Session::has('message_fail'))
+                <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
+              @endif
                 <form method="POST" action="{{ route('roles.store') }}">
                     @csrf
                     <table class="table table-bordered datatable">
@@ -24,8 +26,8 @@
                             </tr>
                         </tbody>
                     </table>
-                    <button class="btn btn-infor" type="submit">Save</button>
-                    <a class="btn btn-warning text white" href="{{ route('roles.index') }}">Return</a>
+                    <button class="btn btn-info" type="submit">Save</button>
+                    <a class="btn btn-warning text-white" href="{{ route('roles.index') }}">Return</a>
                 </form>
             </div>
           </div>

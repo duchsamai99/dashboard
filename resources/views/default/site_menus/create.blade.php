@@ -2,16 +2,17 @@
 
 @section('content')
 
-
 <div class="container-fluid">
   <div class="fade-in">
     <div class="row">
       <div class="col-sm-12">
         <div class="card">
-          <div class="card-header"><h4>Create menu element</h4></div>
+          <div class="card-header"><h4>Create menu site menu</h4></div>
             <div class="card-body">
-                @if(Session::has('message'))
-                    <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
+                @if(Session::has('message_success'))
+                  <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+                @elseif(Session::has('message_fail'))
+                  <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
                 @endif
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -26,37 +27,18 @@
                     @csrf
                     <table class="table table-striped table-bordered datatable">
                         <tbody>
-                            <tr>
+                            <!-- <tr>
                                 <th>
                                     Menu
                                 </th>
-                                <td>
-                                    <select class="form-control" name="menu" id="menu">
+                                <td> -->
+                                    <select hidden class="form-control" name="menu" id="menu">
                                         @foreach($menulist as $menu1)
                                             <option value="{{ $menu1->id }}">{{ $menu1->name }}</option>
                                         @endforeach
                                     </select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>
-                                    User Roles
-                                </th>
-                                <td>
-                                    <table class="table">
-                                    @foreach($roles as $role)
-                                        <tr>
-                                            <td>
-                                                <input type="checkbox" name="role[]" value="{{ $role }}" class="form-control"/>
-                                            </td>
-                                            <td>
-                                                {{ $role }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                    </table>
-                                </td>
-                            </tr>
+                                <!-- </td>
+                            </tr> -->
                             <tr>
                                 <th>
                                     Name
@@ -94,7 +76,7 @@
                                         </select>
                                     </div>
                                     <br><br>
-                                    <div id="div-icon">
+                                    <div hidden id="div-icon">
                                         Icon - Find icon class in: 
                                         <a 
                                             href="https://coreui.io/docs/icons/icons-list/#coreui-icons-free-502-icons"
@@ -121,10 +103,7 @@
 </div>
 
 @endsection
-
 @section('javascript')
 <script src="{{ asset('js/axios.min.js') }}"></script> 
 <script src="{{ asset('js/site-menu-create.js') }}"></script>
-
-
 @endsection

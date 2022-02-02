@@ -1,7 +1,7 @@
 @extends('dashboard.base')
 @section('css') 
-  <!-- <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="_token" content="{!! csrf_token() !!}"/>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -11,53 +11,58 @@
 @section('content')
   <div id="body">
     <div class="container-fluid">
-      <div class="animated fadeIn">
+      <div class="fade-in">
         <div class="row">
-          <div class="col-sm-6 col-md-5 col-lg-4 col-xl-4"></div>
-          <div class="col-sm-6 col-md-5 col-lg-4 col-xl-4">
+          <div class="col-sm-12">
             <div class="card">
               <div class="card-header">
-                <i class="fa fa-align-justify"></i> {{ __('Edit') }} {{ $user->name }}
+               {{ __('Edit') }} {{ $user->name }}
+               
               </div>
               <div class="card-body">
-                <!-- <form id="submit" method="POST" action="/users/{{ $user->id }}"> -->
+              @if(Session::has('message_success'))
+                <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+              @elseif(Session::has('message_fail'))
+                <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
+              @endif
                 <form id="submit" >
-
-                  <!-- @csrf
-                  @method('PUT') -->
-                  <!-- <input class="form-control" type="text" id="menuroles" placeholder="{{ __('Name') }}" name="menuroles" value="{{$user->name }}" required autofocus> -->
                   @if (strpos(Auth::user()->menuroles, 'admin') !== false)
-                    <div class="form-group">
-                        <!-- <div class="input-group-prepend">
-                            <span class="input-group-text">
-                              <svg class="c-icon c-icon-sm">
-                                  <use xlink:href="/assets/icons/coreui/free-symbol-defs.svg#cui-user"></use>
-                              </svg>
-                            </span>
-                        </div> -->
-                        <strong>Username:</strong>
-                        
-                        <input class="form-control" type="text" id="name" placeholder="{{ __('Name') }}" name="name" value="{{$user->name }}" required autofocus>
+                  <div class="row">
+                    <div class="col-sm-6 col-md-6 col-lg-6">
+                      <div class="form-group">
+                          <strong>Username:</strong> 
+                          <input class="form-control" type="text" id="name" placeholder="{{ __('Name') }}" name="name" value="{{$user->name }}" required autofocus>
+                      </div>
                     </div>
-                    <div class="form-group">
-                        <!-- <div class="input-group-prepend">
-                            <span class="input-group-text">@</span>
-                        </div> -->
+                    <div class="col-sm-6 col-md-6 col-lg-6">
+                      <div class="form-group">
                         <strong>Email:</strong>
                         <input class="form-control" type="text" id="email" placeholder="{{ __('E-Mail Address') }}" name="email" value="{{ $user->email }}" required>
+                      </div>
                     </div>
-                  <div class="form-group">
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6 col-md-6 col-lg-6">
+                    <div class="form-group">
                       <strong>Password:</strong>
                       <input class="form-control" type="password" id="password" value="{{$user->password}}"  placeholder="{{ __('Password') }}" name="password" required>
                       <input type="checkbox" id="toggle-password">Show Password
-                  </div>
+                    </div>
+                    </div>
+                    <div class="col-sm-6 col-md-6 col-lg-6">
+                      <div class="form-group">
+                        <strong>Change Profile:</strong>
+                        <input type="file" name="image" id="profileImage" class="form-control image" placeholder="Change profile">
+                        <br>
+                        <img src="/uploads/users/{{$user->image}}" id="preview_image" style="width: 30%;height: 30%; padding: 5px; margin: 0px; ">
+                      </div>
+                    </div>
+                  </div> 
                 @endif
-                  <div class="form-group">
-                    <strong>Change Profile:</strong>
-                    <input type="file" name="image" id="profileImage" class="form-control image" placeholder="Change profile">
-                  </div>
-                  <button class="btn  btn-success" type="submit">{{ __('Save') }}</button>
+                  <button class="btn  btn-info" type="submit">{{ __('Save') }}</button>
+                  @if(Auth::user()->id == 1)
                   <a href="{{ route('users.index') }}" class="btn  btn-warning text-white">{{ __('Return') }}</a> 
+                  @endif
                 </form>
               </div>
             </div>
@@ -96,7 +101,7 @@
             </div>
             <!--endModal -->
           </div>
-          <div class="col-sm-6 col-md-5 col-lg-4 col-xl-4"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -166,8 +171,8 @@
 
   $modal.on('shown.bs.modal', function () {
       cropper = new Cropper(image, {
-      aspectRatio: 1,
-      viewMode: 3,
+      // aspectRatio: 1,
+      // viewMode: 3,
       preview: '.preview'
       });
   }).on('hidden.bs.modal', function () {
@@ -193,6 +198,8 @@
                   data: {'_token': $('meta[name="_token"]').attr('content'), 'profileImage': base64data},
                   success: function(data){
                   getData = data;
+                  $('#preview_image').attr('src', '/uploads/users/'+getData.data);
+
                     console.log(data);
                       $modal.modal('hide');
                       // location.replace('/slides/create');
@@ -211,7 +218,10 @@
     var name = $("#name").val();
     var email= $("#email").val();
     var password = $('#password').val();
-
+    var profile = null;
+    if(getData != undefined){
+      profile = getData.data
+    }
     $.ajax({
       url: "/users/{{ $user->id }}",
       type:"PUT",
@@ -221,10 +231,18 @@
         name:name,
         email:email,
         password:password,
-        image:getData.data
+        image:profile
       },
       success:function(response){
-        location.replace('/users');
+        console.log(response);
+        // location.replace('/users');
+        if(response == true){
+          location.replace('/users');
+
+        }else{
+          location.replace('/users/{{ $user->id }}/edit');
+
+        }
       }
       });
   });

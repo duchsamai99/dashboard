@@ -10,9 +10,11 @@
         <div class="card">
           <div class="card-header"><h4>Edit role</h4></div>
             <div class="card-body">
-                @if(Session::has('message'))
-                    <div class="alert alert-success" role="alert">{{ Session::get('message') }}</div>
-                @endif
+              @if(Session::has('message_success'))
+                <div class="alert alert-success" role="alert">{{ Session::get('message_success') }}</div>
+              @elseif(Session::has('message_fail'))
+                <div class="alert alert-danger" role="alert">{{ Session::get('message_fail') }}</div>
+              @endif
                 <form method="POST" action="{{ route('roles.update', $role->id) }}">
                     @csrf
                     @method('PUT')
